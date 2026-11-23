@@ -26,8 +26,8 @@
 
 ## 文档
 
-- 产品需求：docs/prd.md（待补）
-- 架构决策：docs/adr/（待补）
+- 产品需求：docs/prd.md
+- 架构决策：docs/adr/
 
 ## License
 
