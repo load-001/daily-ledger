@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: daily-ledger
+
+  # 让 Spring 直接读项目根目录的 .env（已被 .gitignore 忽略）
+  config:
+    import: optional:file:.env[.properties]
+
+  datasource:
+    url: "jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3307}/${DB_NAME:daily_ledger}?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai"
+    username: ${DB_USER:ledger}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 3000
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2s
+
+  jackson:
+    time-zone: Asia/Shanghai
+    date-format: yyyy-MM-dd HH:mm:ss
+
+server:
+  port: 8080
+  shutdown: graceful
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    banner: false
+    db-config:
+      id-type: auto
+  mapper-locations: classpath*:/mapper/**/*.xml
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: info
+    com.load.dailyledger: debug
