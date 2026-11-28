@@ -21,6 +21,11 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: false
 
+  session:
+    timeout: 30m
+    redis:
+      namespace: daily-ledger:session
+
   data:
     redis:
       host: ${REDIS_HOST:localhost}

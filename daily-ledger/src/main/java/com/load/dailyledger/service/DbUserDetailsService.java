@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.Locale;
 
 @Service
-abstract public class DbUserDetailsService implements UserDetailsService {
+public class DbUserDetailsService implements UserDetailsService {
     private final UserMapper userMapper;
 
     public DbUserDetailsService(UserMapper userMapper) {

@@ -3,7 +3,7 @@ package com.load.dailyledger.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.load.dailyledger.domain.Users;
 import com.load.dailyledger.dto.RegisterForm;
-import com.load.dailyledger.dto.RegisterResponse;
+import com.load.dailyledger.dto.UserView;
 import com.load.dailyledger.mapper.UserMapper;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
@@ -23,9 +23,11 @@ public class AuthService {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
     }
-    public RegisterResponse register(RegisterForm form){
+
+    //注册用户
+    public UserView register(RegisterForm form){
         // 1. 规范化邮箱
-        String email = form.getEmail().trim().toLowerCase(Locale.ROOT);
+        String email = normalize(form.getEmail());
 
         // 2. 查重（友好提示）
         Long count = userMapper.selectCount(
@@ -47,13 +49,30 @@ public class AuthService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "邮箱已注册");
         }
 
-        return new RegisterResponse(user.getId(), user.getEmail(), user.getDisplayName());
+        return new UserView(user.getId(), user.getEmail(), user.getDisplayName());
     }
 
+    //根据邮箱解析显示名
     private String resolveDisplayName(String raw, String email) {
         String name = (raw == null) ? "" : raw.trim();
         if (name.isEmpty()) {
             name = email.substring(0, email.indexOf('@'));
         }
         return name.length() > 50 ? name.substring(0, 50) : name;}
+
+    //根据邮箱查询用户
+    public UserView findByEmail(String email) {
+        String emailNormalized = normalize(email);
+        Users user = userMapper.selectOne(
+            new LambdaQueryWrapper<Users>().eq(Users::getEmail, emailNormalized));
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "用户不存在");
+        }
+        return UserView.of(user);
+    }
+
+    //邮箱规范化
+    public static String normalize(String email) {
+        return email == null ? "" : email.trim().toLowerCase(Locale.ROOT);
+    }
 }
